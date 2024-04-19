@@ -1,11 +1,16 @@
-// import { SignJWT } from "jose";
 import { User } from "../orm/localDb";
+import { sendConfirmationEmail } from "../mailing/sendEmail";
 
 export async function createNewUser(params: {
   email: string;
   password: string;
 }) {
+  let itWorked = false;
   const users = await User.exist(params.email);
-  console.log(users);
-  if (!users) await User.add(params);
+  //first user is added to temp location, after he confirms email, he is moved to db
+  if (!users) {
+    itWorked = await User.addTemp(params);
+    if (itWorked) sendConfirmationEmail(params.email);
+  }
+  return itWorked;
 }

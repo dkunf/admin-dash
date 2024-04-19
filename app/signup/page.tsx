@@ -37,11 +37,19 @@ async function SignUp() {
     } else {
       //now we can change route to message saying
       //plese go to your email and click the link
-      createNewUser({ email: email as string, password: pwd as string });
+      let newUserIsCreated = await createNewUser({
+        email: email as string,
+        password: pwd as string,
+      });
+      if (newUserIsCreated) {
+        msg = "ok";
+        console.log("new user successfully created");
+      } else {
+        console.log("could not add new user to database");
+      }
+      //this cleans cache, we don't need it later, right?
       revalidatePath("./signup");
     }
-
-    //add to db temp place
 
     //send email with link to confirm signup
 
