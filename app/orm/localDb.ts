@@ -103,6 +103,14 @@ export const User = {
     User.fileLocation = saveOrigLocation;
     User.add(params, "noHash");
   },
+  isPasswordCorrect: async (user: string, pwd: string): Promise<boolean> => {
+    const allUsers = await User.getUsers();
+    let lineNr = allUsers.indexOf(user);
+    console.log("lineNr: ", lineNr);
+    if (lineNr === -1) return false;
+    let existingHash = allUsers[lineNr + 1];
+    return await bcrypt.compare(pwd, existingHash);
+  },
   // temp:(cb: Function) =>{
   //   let saveOrigLocation = User.fileLocation;
   //   User.fileLocation = process.cwd() + "/app/orm/tempUsers.txt";

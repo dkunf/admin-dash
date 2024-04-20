@@ -1,10 +1,6 @@
 import React from "react";
-import {
-  logInDataValidation,
-  userExist,
-} from "@/app/validation/logInDataValidation";
+import { logInDataValidation } from "@/app/validation/logInDataValidation";
 import { revalidatePath } from "next/cache";
-import { createNewUser } from "@/app/auth/createNewUser";
 
 let hasMistake = false;
 let msg = "";
@@ -17,40 +13,13 @@ async function LogIn() {
     const email = formData.get("email");
     const pwd = formData.get("password");
 
-    //i did not decide yet what to show to user yet
-    //this would run this component again to update ui (we are on server)
-    //revalidatePath("/signup")
-
     console.log(email, pwd);
-    //check it
-    //as string is ok because its required field
-    msg = logInDataValidation(email as string, pwd as string);
-    if (msg !== "ok" || userExist(email as string)) {
+
+    msg = await logInDataValidation(email as string, pwd as string);
+    if (msg !== "ok") {
       hasMistake = true;
-      console.log("msg");
-      revalidatePath("./signup");
-    } else {
-      //now we can change route to message saying
-      //plese go to your email and click the link
-      let newUserIsCreated = await createNewUser({
-        email: email as string,
-        password: pwd as string,
-      });
-      if (newUserIsCreated) {
-        msg = "ok";
-        console.log("new user successfully created");
-      } else {
-        console.log("could not add new user to database");
-      }
-      //this cleans cache, we don't need it later, right?
       revalidatePath("./signup");
     }
-
-    //send email with link to confirm signup
-
-    //create that route, which will be triggered by visiting link
-
-    //when triggered new user data should be moved from temp to user table and used for logins
   }
 
   return (
