@@ -1,5 +1,6 @@
 // Use at least Nodemailer v4.1.0
 import nodemailer from "nodemailer";
+import { cfg } from "@/cfg";
 
 export function sendEmail(
   from: string,
@@ -49,15 +50,15 @@ export function sendEmail(
     });
   });
 }
-export function sendConfirmationEmail(email: string) {
+export function sendConfirmationEmail(email: string, link: string) {
   //we'll setup link and other data
   //and will call sendEmail function
-
+  //later we'll use env var to link to propper link
   const from = "ash database handler";
   const to = email;
   const subject = "Nodemailer is unicode friendly ✔";
-  const text = "Hello new user, man you are so lucky :)";
-  const html = "<p><b>Hello</b> to myself!</p>";
+  const text = `Please confirm your email by visiting ${cfg.API.HOST}/email-confirmation/${link}`;
+  const html = `<p>Please confirm your email by clicking this link: <a href='${cfg.API.HOST}/email-confirmation/${link}'>${cfg.API.HOST}/confirm-email/${link}</a></p>`;
 
   sendEmail(from, to, subject, text, html);
 }

@@ -2,9 +2,8 @@
 //interesting: i need wrapper for each method which
 //changes filepath and then sets it back
 
-import { readFile, appendFile } from "fs/promises";
+import { readFile, appendFile, writeFile } from "fs/promises";
 import bcrypt from "bcrypt";
-import { v4 } from "uuid";
 
 export const User = {
   fileLocation: process.cwd() + "/app/orm/data.txt",
@@ -78,15 +77,10 @@ export const User = {
     User.fileLocation = process.cwd() + "/app/orm/tempUsers.txt";
     //this is not very easy for search later. better on new line!
     //but then i need to rewrite add
-    params.uid = v4();
     let isGood = await User.add(params, "shouldHash");
-    if (isGood) {
-      User.fileLocation = saveOrigLocation;
-      return true;
-    } else {
-      User.fileLocation = saveOrigLocation;
-      return false;
-    }
+
+    User.fileLocation = saveOrigLocation;
+    return isGood;
   },
   moveToConfirmed: async (confCode: string) => {
     let saveOrigLocation = User.fileLocation;
@@ -104,7 +98,8 @@ export const User = {
       ...allTempGuys.slice(lineNr + 1),
     ];
     console.log("remainingTempGuys", remainingTempGuys);
-
+    //this way we remove confirmed one
+    await writeFile(User.fileLocation, remainingTempGuys.join("\n"));
     User.fileLocation = saveOrigLocation;
     User.add(params, "noHash");
   },
