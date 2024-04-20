@@ -6,7 +6,7 @@ import { readFile, appendFile, writeFile } from "fs/promises";
 import bcrypt from "bcrypt";
 
 export const User = {
-  fileLocation: process.cwd() + "/app/orm/data.txt",
+  fileLocation: process.cwd() + "/app/orm/user.txt",
   getUsers: async (): Promise<string[]> => {
     let temp: string[] = [];
     try {

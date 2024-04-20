@@ -53,7 +53,7 @@ export function sendEmail(
 export function sendConfirmationEmail(email: string, link: string) {
   //we'll setup link and other data
   //and will call sendEmail function
-  //later we'll use env var to link to propper link
+  //later we'll use env var to link to proper link
   const from = "ash database handler";
   const to = email;
   const subject = "Nodemailer is unicode friendly ✔";
