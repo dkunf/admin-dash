@@ -82,6 +82,17 @@ export const User = {
     User.fileLocation = saveOrigLocation;
     return isGood;
   },
+  addSession: async (user: string, sid: string): Promise<boolean> => {
+    let saveOrigLocation = User.fileLocation;
+    User.fileLocation = process.cwd() + "/app/orm/sessions.txt";
+
+    //so fake, need to refactor
+    let params = { email: user, password: sid };
+    let isGood = await User.add(params, "no hash");
+
+    User.fileLocation = saveOrigLocation;
+    return isGood;
+  },
   moveToConfirmed: async (confCode: string) => {
     let saveOrigLocation = User.fileLocation;
     User.fileLocation = process.cwd() + "/app/orm/tempUsers.txt";
