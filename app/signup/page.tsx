@@ -1,3 +1,8 @@
+//TODO
+//refactor this to invoke try createUser immediately so here code is clean
+//then inside of it there will be checks and whatnot with bubbling up errors
+//remember zod
+
 import React from "react";
 import {
   signUpDataValidation,
@@ -18,8 +23,7 @@ async function SignUp() {
     const pwd = formData.get("password");
     const pwdAgain = formData.get("password-again");
 
-    //i did not decide yet what to show to user yet
-    //this would run this component again to update ui (we are on server)
+    //this would clear cache and run this component again to update ui (we are on server)
     //revalidatePath("/signup")
 
     console.log(email, pwd, pwdAgain);
@@ -30,6 +34,7 @@ async function SignUp() {
       pwd as string,
       pwdAgain as string
     );
+
     if (msg !== "ok" || userExist(email as string)) {
       hasMistake = true;
       console.log("msg");
@@ -41,6 +46,7 @@ async function SignUp() {
         email: email as string,
         password: pwd as string,
       });
+
       if (newUserIsCreated) {
         msg = "ok";
         console.log("new user successfully created");
