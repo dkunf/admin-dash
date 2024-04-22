@@ -5,6 +5,9 @@ import {
   selectFromTableKeysWhere,
   updateTableSetKeyToValueWhere,
   deleteFromTableObjectWhere,
+  selectById,
+  selectAll,
+  selectTempUserByConf,
 } from "../orm/dbOps";
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
@@ -18,12 +21,12 @@ async function SignUp() {
     const pwdAgain = formData.get("password-again");
     console.log(email, pwd, pwdAgain);
     //revalidatePath("/signup")
-
+    /*
     let hashedPwd: string;
     try {
       hashedPwd = await bcrypt.hash(pwd as string, 10);
     } catch (error) {
-      console.log("couldn't hash password, sorry");
+      console.log(error);
       return false;
     }
 
@@ -37,13 +40,48 @@ async function SignUp() {
     } catch (error) {
       console.log(error);
     }
+*/
+
+    //is it good idea to make global cb???
+    const cb = (data: any[] | null, err: Error) => {
+      if (err) console.log(err);
+      else console.log(data);
+    };
 
     //let's view user
+    //so annoying to get results via cb
     try {
-      selectFromTableKeysWhere("tempUsers", ["*"], "username=5");
+      selectFromTableKeysWhere(
+        cb,
+        "tempUsers",
+        ["email", "password"],
+        "id=",
+        3
+      );
     } catch (error) {
       console.log(error);
     }
+
+    //lets get user by id
+    selectById(cb, "tempUsers", 6);
+
+    //lets get all tempUsers
+    // selectAll(cb, "tempUsers");
+
+    selectTempUserByConf((data: any[] | null, err: Error) => {
+      try {
+        if (data) {
+          insertIntoTableObject("users", {
+            email: data[0].email,
+            password: data[0].password,
+          });
+          //also need to delete data from tempUser
+          //TODO
+        } else console.log("no temp user moved to real user");
+      } catch (error) {
+        console.log(error);
+      }
+    }, "35d2ee14-fbe9-4d5a-9320-8b68fd66c465");
 
     //lets update user info
     try {

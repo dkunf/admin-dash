@@ -1,5 +1,4 @@
 import { Database } from "sqlite3";
-import bcrypt from "bcrypt";
 
 let db = new Database(process.cwd() + "/app/orm/sqlite.db");
 
@@ -21,21 +20,62 @@ export const insertIntoTableObject = (
 };
 
 export const selectFromTableKeysWhere = (
+  cb: Function,
   tableName: string,
   cols: string[] = ["*"],
-  where: string = ""
+  keyAndOperator: string = "",
+  val: any = ""
 ) => {
   //SELECT col1, col2,... FROM table WHERE col4=val;
-  if (!where.match(/[=><]/g))
-    throw new Error(
-      "3rd argument should be condition to determine which object to select"
-    );
-
+  if (keyAndOperator !== "") {
+    if (!keyAndOperator.match(/[=><]/g))
+      throw new Error(
+        "3rd argument should be condition to determine which object to select"
+      );
+  }
   let wherePart: string;
-  where === "" ? (wherePart = "") : (wherePart = `WHERE ${where}`);
+  keyAndOperator === ""
+    ? (wherePart = "")
+    : (wherePart = `WHERE ${keyAndOperator} ?`);
 
   let sql = `SELECT ${cols} FROM ${tableName} ${wherePart}`;
   console.log(sql);
+  // let result: any[] | null = [];
+  if (wherePart === "")
+    //db.all returns array, db.get returns 1 object
+    db.all(sql, (err: Error, rows: any[]) => {
+      if (err) {
+        cb(null, err);
+      } else cb(rows, null);
+    });
+  else {
+    db.all(sql, [val], (err: Error, rows: any[]) => {
+      if (err) {
+        cb(null, err);
+      } else cb(rows, null);
+    });
+  }
+};
+
+//how to create partially applied function
+//let's get some specific f derived from our select monster
+//what will happen with cb????
+export const selectById = (cb: Function, tableName: string, id: number) => {
+  selectFromTableKeysWhere(cb, tableName, ["*"], "id = ", id);
+};
+
+export function selectAll(cb: Function, tableName: string) {
+  return selectFromTableKeysWhere(cb, tableName, ["*"]);
+}
+
+export const selectTempUserByConf = (cb: Function, conf: string) => {
+  selectFromTableKeysWhere(
+    cb,
+    "tempUsers",
+    ["email", "password"],
+    "conf = ",
+    conf
+  );
 };
 
 export const updateTableSetKeyToValueWhere = (
