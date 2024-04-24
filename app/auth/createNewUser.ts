@@ -1,4 +1,4 @@
-import { User } from "../orm/localDb";
+import { User } from "../orm/localDb-files-ops";
 import { sendConfirmationEmail } from "../mailing/sendEmail";
 import { v4 } from "uuid";
 import { sign, verify } from "jsonwebtoken";

@@ -21,7 +21,7 @@ async function SignUp() {
     const pwdAgain = formData.get("password-again");
     console.log(email, pwd, pwdAgain);
     //revalidatePath("/signup")
-    /*
+
     let hashedPwd: string;
     try {
       hashedPwd = await bcrypt.hash(pwd as string, 10);
@@ -40,12 +40,11 @@ async function SignUp() {
     } catch (error) {
       console.log(error);
     }
-*/
 
     //is it good idea to make global cb???
     const cb = (data: any[] | null, err: Error) => {
       if (err) console.log(err);
-      else console.log(data);
+      else console.log(data); //i can receive data here and wrk on it
     };
 
     //let's view user
@@ -66,7 +65,7 @@ async function SignUp() {
     selectById(cb, "tempUsers", 6);
 
     //lets get all tempUsers
-    // selectAll(cb, "tempUsers");
+    selectAll(cb, "tempUsers");
 
     selectTempUserByConf((data: any[] | null, err: Error) => {
       try {
@@ -77,7 +76,7 @@ async function SignUp() {
           });
           //also need to delete data from tempUser
           //TODO
-          deleteFromTableObjectWhere("tempUser", `email = ${data[0].email}`);
+          // deleteFromTableObjectWhere("tempUsers", `email = ${data[0].email}`);
         } else console.log("no temp user moved to real user");
       } catch (error) {
         console.log(error);
@@ -86,16 +85,16 @@ async function SignUp() {
 
     //lets update user info
     try {
-      updateTableSetKeyToValueWhere("tempUsers", "email", "d@d.d", "s>3");
+      updateTableSetKeyToValueWhere("tempUsers", "email", "da@da.ad", "id=4");
     } catch (error) {
       console.log(error);
     }
-    //let's delete user
-    //   try {
-    //     deleteFromTableObjectWhere("tempUsers", "d=7");
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
+    // let's delete user
+    try {
+      deleteFromTableObjectWhere("tempUsers", "id=6");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (

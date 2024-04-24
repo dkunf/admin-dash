@@ -1,4 +1,4 @@
-import { User } from "../../orm/localDb";
+import { User } from "../../orm/localDb-files-ops";
 
 export async function GET(req: Request) {
   //HERE WE CHECK IF THERE IS SUCH ROUTE
