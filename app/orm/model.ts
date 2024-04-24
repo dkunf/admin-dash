@@ -40,8 +40,8 @@ class ORM {
   getRecord2(params: { [key: string]: string }) {
     if (!this.allRecords) return [];
     return this.allRecords.filter((obj) => {
-      let arr: [] = Object(JSON.parse(obj)); //[ [key,val],[key,val]... ]
-      let arr2: [] = Object(params);
+      let arr: [string, unknown][] = Object.entries(JSON.parse(obj)); //[ [key,val],[key,val]... ]
+      let arr2: [string, unknown][] = Object.entries(params);
       let flag = false;
       arr.forEach((element) => {
         if (JSON.stringify(element) === JSON.stringify(arr2)) {
