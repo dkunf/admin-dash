@@ -77,6 +77,7 @@ async function SignUp() {
           });
           //also need to delete data from tempUser
           //TODO
+          deleteFromTableObjectWhere("tempUser", `email = ${data[0].email}`);
         } else console.log("no temp user moved to real user");
       } catch (error) {
         console.log(error);
@@ -90,11 +91,11 @@ async function SignUp() {
       console.log(error);
     }
     //let's delete user
-    try {
-      deleteFromTableObjectWhere("tempUsers", "d=7");
-    } catch (error) {
-      console.log(error);
-    }
+    //   try {
+    //     deleteFromTableObjectWhere("tempUsers", "d=7");
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
   }
 
   return (

@@ -57,27 +57,6 @@ export const selectFromTableKeysWhere = (
   }
 };
 
-//how to create partially applied function
-//let's get some specific f derived from our select monster
-//what will happen with cb????
-export const selectById = (cb: Function, tableName: string, id: number) => {
-  selectFromTableKeysWhere(cb, tableName, ["*"], "id = ", id);
-};
-
-export function selectAll(cb: Function, tableName: string) {
-  return selectFromTableKeysWhere(cb, tableName, ["*"]);
-}
-
-export const selectTempUserByConf = (cb: Function, conf: string) => {
-  selectFromTableKeysWhere(
-    cb,
-    "tempUsers",
-    ["email", "password"],
-    "conf = ",
-    conf
-  );
-};
-
 export const updateTableSetKeyToValueWhere = (
   tableName: string,
   key: string,
@@ -109,4 +88,32 @@ export const deleteFromTableObjectWhere = (
 
   let sql = `DELETE FROM ${tableName} WHERE ${where}`;
   console.log(sql);
+  db.run(sql, (err: Error) => {
+    if (err) console.log(err);
+    else {
+      console.log("deleted smth...");
+    }
+  });
+};
+
+//////////////////DERIVED FUNCTIONS//////////////////////////////
+//how to create partially applied function
+//let's get some specific f derived from our select monster
+//what will happen with cb????
+export const selectById = (cb: Function, tableName: string, id: number) => {
+  selectFromTableKeysWhere(cb, tableName, ["*"], "id = ", id);
+};
+
+export function selectAll(cb: Function, tableName: string) {
+  return selectFromTableKeysWhere(cb, tableName, ["*"]);
+}
+
+export const selectTempUserByConf = (cb: Function, conf: string) => {
+  selectFromTableKeysWhere(
+    cb,
+    "tempUsers",
+    ["email", "password"],
+    "conf = ",
+    conf
+  );
 };
