@@ -127,11 +127,15 @@ export function selectAll(cb: Function, tableName: string) {
 
 //conf is confirmation route:   "/email-confirmation/[conf]"
 export const selectTempUserByConf = (cb: Function, conf: string) => {
-  selectFromTableKeysWhere(
+  return selectFromTableKeysWhere(
     cb,
     "tempUsers",
     ["email", "password"],
     "conf = ",
     conf
   );
+};
+
+export const addNewRealUser = (obj: { [keys: string]: unknown }) => {
+  insertIntoTableObject("users", obj);
 };
