@@ -1,3 +1,7 @@
+// TODO: Refactor to Promises
+//Then use async await
+//Use transactions on DB, otherwise no guarantee it all works
+
 import { db } from "./connect";
 import { runMigrations } from "./migrations";
 
