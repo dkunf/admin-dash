@@ -1,25 +1,22 @@
-import { User } from "../orm/localDb-files-ops";
+import { selectUserByEmail } from "../orm/dbOps";
 
 export async function logInDataValidation(
   email: string,
   pwd: string
 ): Promise<string> {
-  let isExistingUser = await userExist(email);
-  console.log("isExistingUser: ", isExistingUser);
-
-  let isPwdCorrect = await checkPwd(email, pwd);
-  console.log("isPwdCorrect: ", isPwdCorrect);
-
-  if (!isExistingUser || !isPwdCorrect)
-    return "please check if your login information is correct";
+  if (await checkCredentials(email, pwd)) return "no";
   return "ok";
 }
 
-async function userExist(email: string): Promise<boolean> {
-  //query db to see if user already exist
-  if (await User.exist(email)) return true;
-  return false;
-}
-async function checkPwd(email: string, pwd: string): Promise<boolean> {
-  return await User.isPasswordCorrect(email, pwd);
+async function checkCredentials(email: string, pwd: string): Promise<boolean> {
+  try {
+    let rows = await selectUserByEmail(email);
+    if (rows) {
+      let em = rows[0].email;
+      let pas = rows[0].password;
+      return em === email && pas === pwd;
+    } else return false;
+  } catch {
+    return false;
+  }
 }

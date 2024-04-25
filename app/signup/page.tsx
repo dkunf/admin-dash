@@ -3,12 +3,13 @@
 //then inside of it there will be checks and whatnot with bubbling up errors
 //remember zod
 
-import React from "react";
 import { signUpDataValidation } from "@/app/validation/signUpDataValidation";
 import { revalidatePath } from "next/cache";
 import { addNewTempUser } from "../orm/dbOps";
 import { v4 } from "uuid";
 import { sendConfirmationEmail } from "../mailing/sendEmail";
+import bcrypt from "bcrypt";
+import { redirect } from "next/navigation";
 
 let hasMistake = false;
 let msg = "";
@@ -36,37 +37,27 @@ async function SignUp() {
       console.log("msg");
       revalidatePath("./signup");
     } else {
-      let conf = v4();
-      //now we can change route to message saying
-      //plese go to your email and click the link
-      const newUserIsCreated = (d: string, e: Error) => {
-        if (!e) {
-          console.log("new user successfully created");
-          console.log(d);
-          //now we need to send him confirmation email
-          sendConfirmationEmail(email as string, conf);
-        } else {
-          hasMistake = true;
-          msg = "Please check your inbox and confirm registration";
-          console.log("could not add new user to database");
-        }
-      };
+      try {
+        let hashedPwd = await bcrypt.hash(pwd as string, 10);
+        let conf = v4();
 
-      addNewTempUser(newUserIsCreated, {
-        email: email as string,
-        password: pwd as string,
-        conf: conf,
-      });
-
-      //this cleans cache, we don't need it later, right?
-      revalidatePath("./signup");
+        console.log(
+          await addNewTempUser({
+            email: email,
+            password: hashedPwd,
+            conf: conf,
+          })
+        );
+        sendConfirmationEmail(email as string, conf);
+        //here we need redirect to page where we say please check your email and confirm signup
+      } catch (error) {
+        console.log(error);
+        msg = "could not add new user to database";
+        console.log("could not add new user to database");
+        hasMistake = true;
+        return false;
+      }
     }
-
-    //send email with link to confirm signup
-
-    //create that route, which will be triggered by visiting link
-
-    //when triggered new user data should be moved from temp to user table and used for logins
   }
 
   return (

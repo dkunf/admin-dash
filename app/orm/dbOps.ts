@@ -15,10 +15,9 @@ runMigrations();
 //INSERT INTO table (keys,...) VALUES (values,...)
 //INSERT INTO table (a,b,c) VALUES (?,?,?)
 export const insertIntoTableObject = (
-  cb: Function,
   tableName: string,
   obj: { [keys: string]: unknown }
-) => {
+): Promise<string> => {
   let keys = Object.keys(obj);
   let values = Object.values(obj);
   let questionMarks = values.map((el) => "?").join(",");
@@ -27,21 +26,24 @@ export const insertIntoTableObject = (
   console.log(sql);
   console.log("values: ", values);
 
-  db.run(sql, values, (err) => {
-    console.log(err);
-    cb("ok", err);
+  return new Promise((resolve, reject) => {
+    db.run(sql, values, (err) => {
+      if (err) reject(err);
+      else
+        resolve(`success:
+      INSERT INTO ${tableName}(${keys}) VALUES (${values})`);
+    });
   });
 };
 
 //generic SELECT
 //SELECT col1, col2,... FROM table WHERE col4=val;
 export const selectFromTableKeysWhere = (
-  cb: Function,
   tableName: string,
   cols: string[] = ["*"],
   keyAndOperator: string = "",
   val: any = ""
-) => {
+): Promise<{ [keys: string]: unknown }[]> => {
   if (keyAndOperator !== "") {
     if (!keyAndOperator.match(/[=><]/g))
       throw new Error(
@@ -59,16 +61,19 @@ export const selectFromTableKeysWhere = (
 
   if (wherePart === "")
     //db.all returns array, db.get returns 1 object
-    db.all(sql, (err: Error, rows: any[]) => {
-      if (err) {
-        cb(null, err);
-      } else cb(rows, null);
+    return new Promise((resolve, reject) => {
+      db.all(sql, (err: Error, rows: any[]) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
     });
   else {
-    db.all(sql, [val], (err: Error, rows: any[]) => {
-      if (err) {
-        cb(null, err);
-      } else cb(rows, null);
+    return new Promise((resolve, reject) => {
+      db.all(sql, [val], (err: Error, rows: any[]) => {
+        if (err) {
+          reject(err);
+        } else resolve(rows);
+      });
     });
   }
 };
@@ -80,31 +85,38 @@ export const updateTableSetKeyToValueWhere = (
   key: string,
   value: string,
   where: string = ""
-) => {
+): Promise<string> => {
   if (!where.match(/[=><]/g))
     throw new Error(
       "4th argument should be condition to determine which object to update"
     );
+  let rWhere = where.split("=")[1];
+  let lWhere = where.split("=")[0];
 
-  //need to change to WHERE x = ?
+  //need to change to WHERE x >= ?
   let wherePart: string;
-  where === "" ? (wherePart = "") : (wherePart = `WHERE ${where}`);
+  where === "" ? (wherePart = "") : (wherePart = `WHERE ${lWhere}=?`);
 
   let sql = `UPDATE ${tableName} SET ${key} = ? ${wherePart}`;
-  db.run(sql, [value], (err) => {
-    console.log(err);
-  });
   console.log(sql);
+  return new Promise((resolve, reject) => {
+    db.run(sql, [value, rWhere], (err) => {
+      if (err) reject(err);
+      else
+        resolve(`success: 
+    UPDATE ${tableName} SET ${key} = ${value} WHERE ${lWhere}=${rWhere}
+    `);
+    });
+  });
 };
 
 //generic DELETE
 //DELETE FROM products WHERE price = 10;
 export const deleteFromTableObjectWhere = (
-  cb: Function,
   tableName: string,
   where: string
-) => {
-  if (!where.match(/[=]/g))
+): Promise<string> => {
+  if (!where.match(/[><=]/g))
     throw new Error(
       "2nd argument should be condition to determine which object to delete"
     );
@@ -113,29 +125,38 @@ export const deleteFromTableObjectWhere = (
 
   let sql = `DELETE FROM ${tableName} WHERE  ${lWhere} = ?`;
   console.log(sql + rWhere);
-  db.run(sql, [rWhere], (err: Error) => cb(err));
+  return new Promise((resolve, reject) => {
+    db.run(sql, [rWhere], (err: Error) => {
+      if (err) reject(err);
+      else
+        resolve(`success: 
+      DELETE FROM ${tableName} WHERE  ${lWhere}= ${rWhere} 
+      `);
+    });
+  });
 };
 
 ////////////////////////////////////////////////////////////////////////////
 ///////////////////////DERIVED FUNCTIONS////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-export const selectById = (cb: Function, tableName: string, id: number) => {
-  selectFromTableKeysWhere(cb, tableName, ["*"], "id = ", id);
+export const selectById = async (tableName: string, id: number) => {
+  return await selectFromTableKeysWhere(tableName, ["*"], "id = ", id);
 };
 
-export const selectUserByEmail = (cb: Function, email: string) => {
-  return selectFromTableKeysWhere(cb, "users", ["*"], "email = ", email);
+export const selectUserByEmail = async (email: string) => {
+  return await selectFromTableKeysWhere("users", ["*"], "email = ", email);
 };
 
-export function selectAll(cb: Function, tableName: string) {
-  return selectFromTableKeysWhere(cb, tableName, ["*"]);
+export async function selectAll(tableName: string) {
+  return await selectFromTableKeysWhere(tableName, ["*"]);
 }
 
 //conf is confirmation route:   "/email-confirmation/[conf]"
-export const selectTempUserByConf = (cb: Function, conf: string) => {
-  return selectFromTableKeysWhere(
-    cb,
+export const selectTempUserByConf = async (
+  conf: string
+): Promise<{ [keys: string]: unknown }[]> => {
+  return await selectFromTableKeysWhere(
     "tempUsers",
     ["email", "password"],
     "conf = ",
@@ -143,16 +164,10 @@ export const selectTempUserByConf = (cb: Function, conf: string) => {
   );
 };
 
-export const addNewRealUser = (
-  cb: Function,
-  obj: { [keys: string]: unknown }
-) => {
-  insertIntoTableObject(cb, "users", obj);
+export const addNewRealUser = async (obj: { [keys: string]: unknown }) => {
+  await insertIntoTableObject("users", obj);
 };
 
-export const addNewTempUser = (
-  cb: Function,
-  obj: { [keys: string]: unknown }
-) => {
-  insertIntoTableObject(cb, "tempUsers", obj);
+export const addNewTempUser = async (obj: { [keys: string]: unknown }) => {
+  await insertIntoTableObject("tempUsers", obj);
 };

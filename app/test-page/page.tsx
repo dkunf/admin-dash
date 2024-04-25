@@ -8,6 +8,7 @@ import {
   selectById,
   selectAll,
   selectTempUserByConf,
+  addNewTempUser,
 } from "../orm/dbOps";
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
@@ -22,27 +23,34 @@ async function SignUp() {
     console.log(email, pwd, pwdAgain);
     //revalidatePath("/signup")
 
-    let hashedPwd: string;
+    let hashedPwd = await bcrypt.hash(pwd as string, 10);
     try {
-      hashedPwd = await bcrypt.hash(pwd as string, 10);
+      console.log(
+        await addNewTempUser({
+          email: email,
+          password: hashedPwd,
+          conf: v4(),
+        })
+      );
     } catch (error) {
       console.log(error);
       return false;
     }
 
     //is it good idea to make global cb???
-    const cb = (data: any[] | null, err: Error) => {
-      if (err) console.log(err);
-      else console.log(data); //i can receive data here and wrk on it
-    };
+    // const cb = (data: any[] | null, err: Error) => {
+    //   if (err) console.log(err);
+    //   else console.log(data); //i can receive data here and wrk on it
+    // };
 
     //let's create user
     try {
-      insertIntoTableObject(cb, "tempUsers", {
+      let result = await insertIntoTableObject("tempUsers", {
         email: email,
         password: hashedPwd,
         conf: v4(),
       });
+      console.log(result);
     } catch (error) {
       console.log(error);
     }
@@ -50,42 +58,32 @@ async function SignUp() {
     //let's view user
     //so annoying to get results via cb
     try {
-      selectFromTableKeysWhere(
-        cb,
+      let result = await selectFromTableKeysWhere(
         "tempUsers",
         ["email", "password"],
         "id=",
         3
       );
+      console.log(result);
     } catch (error) {
       console.log(error);
     }
 
     //lets get user by id
-    selectById(cb, "tempUsers", 6);
+    selectById("tempUsers", 6);
 
     //lets get all tempUsers
-    selectAll(cb, "tempUsers");
-
-    selectTempUserByConf((data: any[] | null, err: Error) => {
-      try {
-        if (data) {
-          insertIntoTableObject(cb, "users", {
-            email: data[0].email,
-            password: data[0].password,
-          });
-          //also need to delete data from tempUser
-          //TODO
-          // deleteFromTableObjectWhere("tempUsers", `email = ${data[0].email}`);
-        } else console.log("no temp user moved to real user");
-      } catch (error) {
-        console.log(error);
-      }
-    }, "35d2ee14-fbe9-4d5a-9320-8b68fd66c465");
+    selectAll("tempUsers");
 
     //lets update user info
     try {
-      updateTableSetKeyToValueWhere("tempUsers", "email", "da@da.ad", "id=4");
+      let result = await updateTableSetKeyToValueWhere(
+        "tempUsers",
+        "email",
+        "da@da.ad",
+        "id=4"
+      );
+      console.log(result);
     } catch (error) {
       console.log(error);
     }
