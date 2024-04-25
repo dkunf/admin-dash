@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import { sign, verify } from "jsonwebtoken";
+import { addSession, getUsersId } from "../orm/dbOps";
 
 //get id of given user
 //generate id of session
@@ -7,13 +8,23 @@ import { sign, verify } from "jsonwebtoken";
 //create token with both id?
 //sign token with expiration
 //send it in Authorization Bearer header
-export async function startSession(user: string) {
-  let sessionId = v4();
+export async function startSession(email: string) {
+  try {
+    let userId = await getUsersId(email);
+    let sessionId = v4();
 
-  // User.addSession(user, sessionId);
-  let secret = process.env.JWT_SECRET;
-  console.log("secret: ", secret);
-
-  const token = sign({ sid: sessionId }, secret as string);
-  console.log(token);
+    let secret = process.env.JWT_SECRET;
+    console.log("secret: ", secret);
+    if (userId[0]) {
+      const token = sign({ sid: sessionId }, secret as string, {
+        expiresIn: "3d",
+      });
+      console.log(token);
+      await addSession(userId[0].id as unknown as string, sessionId);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
+// check that:
+//https://apidog.com/articles/json-web-token-jwt-nodejs/

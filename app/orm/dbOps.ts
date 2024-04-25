@@ -165,9 +165,17 @@ export const selectTempUserByConf = async (
 };
 
 export const addNewRealUser = async (obj: { [keys: string]: unknown }) => {
-  await insertIntoTableObject("users", obj);
+  return await insertIntoTableObject("users", obj);
 };
 
 export const addNewTempUser = async (obj: { [keys: string]: unknown }) => {
-  await insertIntoTableObject("tempUsers", obj);
+  return await insertIntoTableObject("tempUsers", obj);
+};
+
+export const getUsersId = async (email: string) => {
+  return await selectFromTableKeysWhere("users", ["id"], "email=", email);
+};
+
+export const addSession = async (userId: string, sessionId: string) => {
+  return await insertIntoTableObject("sessions", { userId, sessionId });
 };
