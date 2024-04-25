@@ -4,7 +4,7 @@ export function runMigrations() {
   db.run(
     `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email VARCHAR(200) NOT NULL,
+      email VARCHAR(200) NOT NULL UNIQUE,
       password TEXT NOT NULL
   )`,
     (err) => {
@@ -19,7 +19,7 @@ export function runMigrations() {
   db.run(
     `CREATE TABLE IF NOT EXISTS tempUsers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email VARCHAR(200) NOT NULL,
+      email VARCHAR(200) NOT NULL UNIQUE,
       password TEXT NOT NULL,
       conf TEXT NOT NULL
   )`,

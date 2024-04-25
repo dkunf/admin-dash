@@ -3,12 +3,13 @@ import { sendConfirmationEmail } from "../mailing/sendEmail";
 import { v4 } from "uuid";
 import { sign, verify } from "jsonwebtoken";
 
-export async function createNewUser(params: {
+export async function createNewTempUser(params: {
   email: string;
   password: string;
   uid?: string;
 }) {
   let itWorked = false;
+
   const users = await User.exist(params.email);
   //first user is added to temp location, after he confirms email, he is moved to db
   if (!users) {
@@ -18,6 +19,7 @@ export async function createNewUser(params: {
   }
   return itWorked;
 }
+
 export async function startSession(user: string) {
   let sessionId = v4();
   User.addSession(user, sessionId);

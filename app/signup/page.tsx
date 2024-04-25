@@ -4,12 +4,11 @@
 //remember zod
 
 import React from "react";
-import {
-  signUpDataValidation,
-  userExist,
-} from "@/app/validation/signUpDataValidation";
+import { signUpDataValidation } from "@/app/validation/signUpDataValidation";
 import { revalidatePath } from "next/cache";
-import { createNewUser } from "@/app/auth/createNewUser";
+import { addNewTempUser } from "../orm/dbOps";
+import { v4 } from "uuid";
+import { sendConfirmationEmail } from "../mailing/sendEmail";
 
 let hasMistake = false;
 let msg = "";
@@ -23,11 +22,8 @@ async function SignUp() {
     const pwd = formData.get("password");
     const pwdAgain = formData.get("password-again");
 
-    //this would clear cache and run this component again to update ui (we are on server)
-    //revalidatePath("/signup")
-
     console.log(email, pwd, pwdAgain);
-    //check it
+
     //as string is ok because its required field
     msg = signUpDataValidation(
       email as string,
@@ -35,24 +31,33 @@ async function SignUp() {
       pwdAgain as string
     );
 
-    if (msg !== "ok" || userExist(email as string)) {
+    if (msg !== "ok") {
       hasMistake = true;
       console.log("msg");
       revalidatePath("./signup");
     } else {
+      let conf = v4();
       //now we can change route to message saying
       //plese go to your email and click the link
-      let newUserIsCreated = await createNewUser({
+      const newUserIsCreated = (d: string, e: Error) => {
+        if (!e) {
+          console.log("new user successfully created");
+          console.log(d);
+          //now we need to send him confirmation email
+          sendConfirmationEmail(email as string, conf);
+        } else {
+          hasMistake = true;
+          msg = "Please check your inbox and confirm registration";
+          console.log("could not add new user to database");
+        }
+      };
+
+      addNewTempUser(newUserIsCreated, {
         email: email as string,
         password: pwd as string,
+        conf: conf,
       });
 
-      if (newUserIsCreated) {
-        msg = "ok";
-        console.log("new user successfully created");
-      } else {
-        console.log("could not add new user to database");
-      }
       //this cleans cache, we don't need it later, right?
       revalidatePath("./signup");
     }

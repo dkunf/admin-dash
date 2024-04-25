@@ -11,6 +11,7 @@ runMigrations();
 //INSERT INTO table (keys,...) VALUES (values,...)
 //INSERT INTO table (a,b,c) VALUES (?,?,?)
 export const insertIntoTableObject = (
+  cb: Function,
   tableName: string,
   obj: { [keys: string]: unknown }
 ) => {
@@ -20,9 +21,11 @@ export const insertIntoTableObject = (
 
   let sql = `INSERT INTO ${tableName}(${keys}) VALUES (${questionMarks})`;
   console.log(sql);
+  console.log("values: ", values);
 
   db.run(sql, values, (err) => {
     console.log(err);
+    cb("ok", err);
   });
 };
 
@@ -93,6 +96,7 @@ export const updateTableSetKeyToValueWhere = (
 //generic DELETE
 //DELETE FROM products WHERE price = 10;
 export const deleteFromTableObjectWhere = (
+  cb: Function,
   tableName: string,
   where: string
 ) => {
@@ -103,14 +107,9 @@ export const deleteFromTableObjectWhere = (
   let lWhere = where.split("=")[0];
   let rWhere = where.split("=")[1];
 
-  let sql = `DELETE FROM ${tableName} WHERE  ${lWhere}=?`;
-  console.log(sql);
-  db.run(sql, [rWhere], (err: Error) => {
-    if (err) console.log(err);
-    else {
-      console.log(`in table ${tableName} deleted row with ${where}`);
-    }
-  });
+  let sql = `DELETE FROM ${tableName} WHERE  ${lWhere} = ?`;
+  console.log(sql + rWhere);
+  db.run(sql, [rWhere], (err: Error) => cb(err));
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -119,6 +118,10 @@ export const deleteFromTableObjectWhere = (
 
 export const selectById = (cb: Function, tableName: string, id: number) => {
   selectFromTableKeysWhere(cb, tableName, ["*"], "id = ", id);
+};
+
+export const selectUserByEmail = (cb: Function, email: string) => {
+  return selectFromTableKeysWhere(cb, "users", ["*"], "email = ", email);
 };
 
 export function selectAll(cb: Function, tableName: string) {
@@ -136,6 +139,16 @@ export const selectTempUserByConf = (cb: Function, conf: string) => {
   );
 };
 
-export const addNewRealUser = (obj: { [keys: string]: unknown }) => {
-  insertIntoTableObject("users", obj);
+export const addNewRealUser = (
+  cb: Function,
+  obj: { [keys: string]: unknown }
+) => {
+  insertIntoTableObject(cb, "users", obj);
+};
+
+export const addNewTempUser = (
+  cb: Function,
+  obj: { [keys: string]: unknown }
+) => {
+  insertIntoTableObject(cb, "tempUsers", obj);
 };

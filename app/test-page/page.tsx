@@ -30,9 +30,15 @@ async function SignUp() {
       return false;
     }
 
+    //is it good idea to make global cb???
+    const cb = (data: any[] | null, err: Error) => {
+      if (err) console.log(err);
+      else console.log(data); //i can receive data here and wrk on it
+    };
+
     //let's create user
     try {
-      insertIntoTableObject("tempUsers", {
+      insertIntoTableObject(cb, "tempUsers", {
         email: email,
         password: hashedPwd,
         conf: v4(),
@@ -40,12 +46,6 @@ async function SignUp() {
     } catch (error) {
       console.log(error);
     }
-
-    //is it good idea to make global cb???
-    const cb = (data: any[] | null, err: Error) => {
-      if (err) console.log(err);
-      else console.log(data); //i can receive data here and wrk on it
-    };
 
     //let's view user
     //so annoying to get results via cb
@@ -70,7 +70,7 @@ async function SignUp() {
     selectTempUserByConf((data: any[] | null, err: Error) => {
       try {
         if (data) {
-          insertIntoTableObject("users", {
+          insertIntoTableObject(cb, "users", {
             email: data[0].email,
             password: data[0].password,
           });

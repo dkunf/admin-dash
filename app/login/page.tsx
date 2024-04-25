@@ -1,7 +1,7 @@
 import React from "react";
 import { logInDataValidation } from "@/app/validation/logInDataValidation";
 import { revalidatePath } from "next/cache";
-import { startSession } from "../auth/createNewUser";
+import { startSession } from "../auth/createNewTempUser";
 
 let hasMistake = false;
 let msg = "";
