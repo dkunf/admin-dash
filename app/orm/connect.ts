@@ -1,3 +1,4 @@
+//we will keep sqlite for users logging... and then Prisma for managing db operations
 import sqlite3 from "sqlite3";
 
 export const db = new sqlite3.Database(
