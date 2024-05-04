@@ -1,10 +1,13 @@
 import { selectUserByEmail } from "../orm/dbOps";
+import bcrypt from "bcrypt";
 
 export async function logInDataValidation(
   email: string,
   pwd: string
 ): Promise<string> {
-  if (await checkCredentials(email, pwd)) return "no";
+  let hashedPwd = await bcrypt.hash(pwd as string, 10);
+
+  if (await checkCredentials(email, hashedPwd)) return "no";
   return "ok";
 }
 

@@ -19,7 +19,7 @@ async function LogIn() {
     msg = await logInDataValidation(email as string, pwd as string);
     if (msg !== "ok") {
       hasMistake = true;
-      revalidatePath("./login");
+      revalidatePath("./");
     } else startSession(email as string);
   }
 

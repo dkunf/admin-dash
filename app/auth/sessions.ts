@@ -1,6 +1,8 @@
 import { v4 } from "uuid";
 import { sign, verify } from "jsonwebtoken";
 import { addSession, getUsersId } from "../orm/dbOps";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 //get id of given user
 //generate id of session
@@ -19,8 +21,10 @@ export async function startSession(email: string) {
       const token = sign({ sid: sessionId }, secret as string, {
         expiresIn: "3d",
       });
-      console.log(token);
+      console.log("token: ", token);
       await addSession(userId[0].id as unknown as string, sessionId);
+      revalidatePath("./");
+      return token;
     }
   } catch (error) {
     console.log(error);

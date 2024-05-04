@@ -10,6 +10,7 @@ import { v4 } from "uuid";
 import { sendConfirmationEmail } from "../mailing/sendEmail";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 let hasMistake = false;
 let msg = "";
@@ -61,41 +62,48 @@ async function SignUp() {
   }
 
   return (
-    <form
-      action={registerNewUser}
-      className="flex flex-col items-start gap-8 bg-gradient-to-br from-stone-200 to-stone-400 rounded p-12 text-black"
-    >
-      <label
-        className="flex flex-col gap-2 sm:flex-row sm:gap-12 w-full justify-between"
-        htmlFor="email"
+    <div className="h-screen w-screen flex flex-col gap-4 items-center justify-center">
+      <h1 className="text-2xl text-center">Sign Up</h1>
+      <h2 className="text-l text-center">to manage data in your database</h2>
+      <form
+        action={registerNewUser}
+        className="flex flex-col items-start gap-8 bg-gradient-to-br from-stone-200 to-stone-400 rounded p-12 text-black"
       >
-        Enter your Email
-        <input required className="rounded" type="email" name="email" />
-      </label>
-      <label
-        className="flex flex-col gap-2 sm:flex-row sm:gap-12 w-full justify-between"
-        htmlFor="password"
-      >
-        Create a good Password
-        <input required className="rounded" type="password" name="password" />
-      </label>
-      <label
-        className="flex flex-col gap-2 sm:flex-row sm:gap-12 w-full justify-between"
-        htmlFor="password-again"
-      >
-        Repeat your password
-        <input
-          required
-          className="rounded"
-          type="password"
-          name="password-again"
-        />
-      </label>
-      {hasMistake && <p style={{ color: "red" }}>{msg}</p>}
-      <button className="flex border p-2 rounded bg-stone-100 hover:bg-stone-200 shadow">
-        Create Account
-      </button>
-    </form>
+        <label
+          className="flex flex-col gap-2 sm:flex-row sm:gap-12 w-full justify-between"
+          htmlFor="email"
+        >
+          Enter your Email
+          <input required className="rounded" type="email" name="email" />
+        </label>
+        <label
+          className="flex flex-col gap-2 sm:flex-row sm:gap-12 w-full justify-between"
+          htmlFor="password"
+        >
+          Create a good Password
+          <input required className="rounded" type="password" name="password" />
+        </label>
+        <label
+          className="flex flex-col gap-2 sm:flex-row sm:gap-12 w-full justify-between"
+          htmlFor="password-again"
+        >
+          Repeat your password
+          <input
+            required
+            className="rounded"
+            type="password"
+            name="password-again"
+          />
+        </label>
+        {hasMistake && <p style={{ color: "red" }}>{msg}</p>}
+        <button className="flex border p-2 rounded bg-stone-100 hover:bg-stone-200 shadow">
+          Create Account
+        </button>
+        <Link className="self-end" href="./">
+          Login
+        </Link>
+      </form>
+    </div>
   );
 }
 
