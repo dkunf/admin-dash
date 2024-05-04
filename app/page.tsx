@@ -55,6 +55,9 @@ async function LogIn() {
         <Link className="self-end" href="/signup">
           SignUp
         </Link>
+        <Link className="self-end" href="/ok/view-db">
+          Check your DB
+        </Link>
       </form>
     </div>
   );
