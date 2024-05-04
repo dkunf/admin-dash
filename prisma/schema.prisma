@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model announcement {
+  message      String? @db.Xml
+  placement_id String? @db.VarChar(25)
+  attributes   String? @db.VarChar(50)
+  id           Int     @id(map: "anouncements_pkey") @default(autoincrement())
+}
+
+model delivery_option {
+  operatorius String?  @db.VarChar
+  kaina       Decimal? @db.Money
+  aprasymas   String?
+  ar_rodoma   Boolean?
+  delivery_id Int      @id(map: "siuntimas_pkey") @default(autoincrement())
+  trukme_dd   String?  @db.VarChar
+  order       order[]
+}
+
+model email {
+  email           String?   @db.Char(50)
+  date_subscribed DateTime? @default(now()) @db.Timestamp(6)
+  id              Int       @id(map: "emails_pkey") @default(autoincrement())
+}
+
+model faktura {
+  total_paid     Decimal?  @db.Money
+  total_product  Decimal?  @db.Money
+  total_delivery Decimal?  @db.Money
+  client_name    String?
+  client_contact String?
+  client_code    String?
+  total_discount Decimal?  @db.Money
+  date_issued    DateTime? @db.Timestamp(6)
+  nr             Int       @id(map: "fakturos_pkey") @default(autoincrement())
+  order          order[]
+}
+
+model order {
+  contact         String?          @db.VarChar
+  timestamp       DateTime?        @default(now()) @db.Timestamp(6)
+  order_nr        Int              @id(map: "orders_pkey") @default(autoincrement())
+  paid            Boolean?
+  sent_out        Boolean?
+  delivery_id     Int?
+  delivery_adr    String?
+  pay_id          Int?
+  faktura_nr      Int?
+  total_paid      Decimal?         @db.Money
+  receipt_url     String?
+  comments        String?
+  token           String?
+  delivery_option delivery_option? @relation(fields: [delivery_id], references: [delivery_id], onDelete: NoAction, onUpdate: NoAction, map: "orders_delivery_id_fkey")
+  faktura         faktura?         @relation(fields: [faktura_nr], references: [nr], onDelete: NoAction, onUpdate: NoAction, map: "orders_faktura_nr_fkey")
+  payment         payment?         @relation(fields: [pay_id], references: [pay_id], onDelete: NoAction, onUpdate: NoAction, map: "orders_pay_id_fkey")
+  product         product[]
+}
+
+model payment {
+  pay_id Int      @id @default(autoincrement())
+  name   String?
+  fee    Decimal? @db.Money
+  order  order[]
+}
+
+model product {
+  name          String?  @db.VarChar(20)
+  category      String?  @db.VarChar(20)
+  price         Decimal? @db.Money
+  description   String?
+  size          String?  @db.VarChar(20)
+  weight        String?  @db.VarChar(10)
+  pic_thumbnail String?
+  pic_large     String?
+  prod_id       Int      @id(map: "products_pkey") @unique(map: "uniqa") @default(autoincrement())
+  status        String?  @db.Char(4)
+  page          Decimal? @db.Decimal
+  order_nr      Int?
+  order         order?   @relation(fields: [order_nr], references: [order_nr], onDelete: NoAction, onUpdate: NoAction, map: "fk_order_nr")
+}
+
+model session {
+  floka_token    String?
+  stripe_session String?
+  id             Int     @id(map: "sessions_pkey") @default(autoincrement())
+}

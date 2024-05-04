@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Database viewer
 
-## Getting Started
+#MASTER# branch is most important
 
-First, run the development server:
+The goal of this app was to make it easier to visualize database and edit data in it.
+Kind of CMS. It's just for learning purposes...
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+I chose new technologies for me and did not succeed yet:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Nextjs
+Postgres (on Supabase) for managing DB
+sqlite3 for managing user accounts
+Prisma
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+##To use it :
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. clone or fork this repo to your local machine
+2. npm i
+3. add your database connection string (DATABASE_URL=....)
+4. add JWT_SECRET=.... .env.local file
 
-## Learn More
+##routes
+http://localhost:3000/ok/view-db
+shows all tables of your database as hexagons
+idea was to connect hexagons of related tables (by foreign keys), but it's not done yet
 
-To learn more about Next.js, take a look at the following resources:
+when you click on small + sign you navigate to
+http://localhost:3000/ok/view-db/[your_table_name]
+where you can add rows to your table (it's also not working yet)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+##TO DO:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. view data of tables
+2. validate data
+3. upload images and preview
+4. view related tables as connected hexagons
+5. colorize columns, which are autoincrement, primary key, not null, foreign key etc...

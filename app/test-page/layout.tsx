@@ -18,10 +18,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="h-screen w-screen flex flex-col gap-4 items-center justify-center">
-          <h1 className="text-2xl text-center">Log In</h1>
-          <h2 className="text-l text-center">
-            to manage data in your database
-          </h2>
+          <h1 className="text-2xl text-center">
+            {" "}
+            TEST PAGE THAT INVOKES DB OPERATIONS etc.
+          </h1>
           {children}
         </div>
       </body>

@@ -1,0 +1,15 @@
+.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+}
+.insert {
+  /* padding-top: 2rem; */
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  overflow-y: scroll;
+}
