@@ -67,16 +67,16 @@ export default function HexGrid(props: TbNames) {
   let coords: Placement[];
   let l = 0;
   let t = 0;
-  coords = [[hb, va]];
 
   let hSt = hb;
   let vSt = va;
   let row = vc - va;
   let iterations = 0;
-  let i = 0;
+  let i = 1;
   let tbCount = Object.keys(groupedData).length;
 
-  while (iterations <= tbCount + 5) {
+  coords = [[hSt - hb, vSt]];
+  while (iterations <= tbCount + 1) {
     if (hSt + textWidth * i + textWidth / 2 < screenW) {
       coords.push([hSt + textWidth * i - hb, vSt]);
       iterations++;
